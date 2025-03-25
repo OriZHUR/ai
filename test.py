@@ -60,6 +60,10 @@ from sklearn.metrics import mean_squared_error, r2_score
 mse = mean_squared_error(test_df['price'], predictions)
 r2 = r2_score(test_df['price'], predictions)
 
+# שמירת התוצאות של המודל הראשון
+mse_simple = mse
+r2_simple = r2
+
 # הדפסת תוצאות
 print("# תוצאות המודל:")
 print(f"MSE: {mse:.4f}")
@@ -94,7 +98,81 @@ fig.show()
 # 5
 # יצירת מודל רגרסיה מרובה משתנים
 # בחירת המשתנים המובילים
-selected_features = ['carat', '', '', '']
+selected_features = ['carat', 'x',  'y', 'z']
 X = df[selected_features]
+Y = df['price']
+
+# חלוקת הנתונים לסטים עיבוד ובדיקה
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+
+# יצירת טבלאות עם הנתונים המטרים והמבחנים
+train_df = pd.DataFrame(X_train, columns=selected_features)
+train_df['price'] = Y_train
+
+test_df = pd.DataFrame(X_test, columns=selected_features)
+test_df['price'] = Y_test
+
+# יצירת מודל רגרסיה מרובה משתנים
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(train_df[selected_features], train_df['price'])
+
+# חישוב ניבויים על סט הבדיקה
+predictions = model.predict(test_df[selected_features])
+
+# חישוב מדדי ביצוע
+from sklearn.metrics import mean_squared_error, r2_score
+mse = mean_squared_error(test_df['price'], predictions)
+r2 = r2_score(test_df['price'], predictions)
+
+# הדפסת תוצאות
+print("# תוצאות המודל:")
+print(f"MSE: {mse:.4f}")
+print(f"R2 Score: {r2:.4f}")
+
+# יצירת גרף השוואה בין ערכים אמיתיים לניבויים
+fig = go.Figure()
+
+# הוספת הערכים האמיתיים
+fig.add_trace(go.Scatter(x=test_df['carat'], 
+                        y=test_df['price'],
+                        mode='markers',
+                        name='ערכים אמיתיים'))
+
+# הוספת הניבויים
+fig.add_trace(go.Scatter(x=test_df['carat'],
+                        y=predictions,
+                        mode='lines',
+                        name='ניבויים'))
+
+fig.update_layout(title='השוואה בין ערכים אמיתיים לניבויים',
+                 xaxis_title='Carat',
+                 yaxis_title='Price')
+fig.show()
+
+# הערכת איכות המודל:
+# מסקנה: על פי ערך ה-R2 שהתקבל, המודל מסביר חלק משמעותי מהשונות במחיר על בסיס משקל היהלום 
+# אך עדיין יש מקום לשיפור - ייתכן שכדאי להוסיף משתנים נוספים או להשתמש במודל מורכב יותר
+
+# השוואה בין המודל הראשטון לשני
+print("\n# השוואה בין המודלים:")
+print("מודל ראשון (רגרסיה פשוטה):")
+print(f"MSE: {mse_simple:.4f}")
+print(f"R2 Score: {r2_simple:.4f}")
+
+print("\nמודל שני (רגרסיה מרובת משתנים):")
+print(f"MSE: {mse:.4f}") 
+print(f"R2 Score: {r2:.4f}")
+
+print("\nמסקנות:")
+if r2 > r2_simple:
+    print("המודל השני (מרובה משתנים) מדויק יותר מהמודל הראשון")
+    print(f"שיפור של {((r2 - r2_simple) / r2_simple * 100):.1f}% ב-R2 Score")
+else:
+    print("המודל הראשון (פשוט) מדויק יותר מהמודל השני")
+    print(f"ירידה של {((r2_simple - r2) / r2_simple * 100):.1f}% ב-R2 Score")
+
+
+
 
 
