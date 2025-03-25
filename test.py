@@ -46,7 +46,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_
 # יצירת טבלאות עם הנתונים המטרים והמבחנים
 train_df = pd.DataFrame({'carat': X_train, 'price': Y_train})
 test_df = pd.DataFrame({'carat': X_test, 'price': Y_test})
-
+# 4
 # יצירת מודל לינארי
 from sklearn.linear_model import LinearRegression
 model = LinearRegression()
@@ -91,7 +91,7 @@ fig.show()
 # אך עדיין יש מקום לשיפור - ייתכן שכדאי להוסיף משתנים נוספים או להשתמש במודל מורכב יותר
 
 
-# 4
+# 5
 # יצירת מודל רגרסיה מרובה משתנים
 # בחירת המשתנים המובילים
 selected_features = ['carat', '', '', '']
